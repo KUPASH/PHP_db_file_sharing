@@ -84,7 +84,9 @@ session_start();
 
             while ($row = mysqli_fetch_assoc($result)) {
                 echo '<img src="' . $row['way'] . '" width="100"/> <br/>
-                    <a href="delete.php?del='.$row['id'].'">Delete picture</a> <br/>';
+                    <a href="delete.php?del='.$row['id'].'">Delete picture</a> 
+                    <a href="download.php?name=' . $row['way'] . '">Link</a>
+                    <input value="' . $row['way'] . '"> <br/>';
             }
         } else {
             echo 'Что-то пошло не так!';
