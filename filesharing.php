@@ -52,20 +52,39 @@ session_start();
                         $subdirname2 . '/' .
                         $filename . '.' . $ext);
 
-                    $fileway = './uploads/' .
+                    if (file_exists('./uploads/' .
                         $subdirname1 . '/' .
                         $subdirname2 . '/' .
-                        $filename . '.' . $ext;
-                    $conn = mysqli_connect(
-                        'localhost',
-                        'root',
-                        '',
-                        'localhost_table'
-                    );
-                    $sql = 'INSERT INTO files (way, user_id) VALUES ("'.$fileway.'",'.$_SESSION['id'].')';
-                    mysqli_query($conn, $sql);
+                        $filename . '.' . $ext)) {
+
+                        $fileway = './uploads/' .
+                            $subdirname1 . '/' .
+                            $subdirname2 . '/' .
+                            $filename . '.' . $ext;
+                        $conn = mysqli_connect(
+                            'localhost',
+                            'root',
+                            '',
+                            'localhost_table'
+                        );
+                        $sql = 'INSERT INTO files (way, user_id) VALUES ("' . $fileway . '",' . $_SESSION['id'] . ')';
+                        mysqli_query($conn, $sql);
+                    }
 
                 }
+            }
+            $sql = 'SELECT * FROM files WHERE user_id='.$_SESSION['id'];
+            $conn = mysqli_connect(
+                'localhost',
+                'root',
+                '',
+                'localhost_table'
+            );
+            $result = mysqli_query($conn, $sql);
+
+            while ($row = mysqli_fetch_assoc($result)) {
+                echo '<img src="' . $row['way'] . '" width="100"/> <br/>
+                    <a href="delete.php?del='.$row['id'].'">Delete picture</a> <br/>';
             }
         } else {
             echo 'Что-то пошло не так!';
