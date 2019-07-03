@@ -15,7 +15,7 @@ if(isset($_SESSION['id']) && isset($_SESSION['login'])) {
         );
         $sql = 'SELECT * FROM files WHERE user_id="' . $_SESSION['id'] . '"AND id=' . $num_string;
         $file = mysqli_fetch_assoc(mysqli_query($conn, $sql));
-        $fileway = $file['way'];
+        $fileway = './uploads/' . $file['hash_name'][0] . '/' . $file['hash_name'][1] . '/' . $file['hash_name'];
 
         $conn = mysqli_connect(
             'localhost',

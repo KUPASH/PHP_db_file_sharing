@@ -18,14 +18,23 @@ session_start();
             <a href="logout.php">Logout</a> </br>
 
             <?
+            function generateKey() {
+                $imageKey = '';
+                $keyLength = 8;
+                for($i=0; $i<$keyLength; $i++) {
+                    $imageKey .= chr(mt_rand(33,126));
+                }
+                return $imageKey;
+            }
             $allowed_ext = ['jpg', 'jpeg'];
 
             echo '<pre>';
             print_r($_FILES);
             echo '</pre>';
 
-            if (isset($_FILES['userFile'])) {
-                $filename = md5(time() . rand(1, 9999) . $_FILES['userFile']['name']);
+            if (isset($_FILES['userFile']) && $_FILES['userFile']['error'] == 0) {
+                $realName = $_FILES['userFile']['name'];
+                $filename = md5(time() . rand(1, 9999) . $realName);
 
                 $ext = explode('.', $_FILES['userFile']['name']);
                 $ext = $ext[count($ext) - 1];
@@ -57,21 +66,26 @@ session_start();
                         $subdirname2 . '/' .
                         $filename . '.' . $ext)) {
 
-                        $fileway = './uploads/' .
-                            $subdirname1 . '/' .
-                            $subdirname2 . '/' .
-                            $filename . '.' . $ext;
+                        $imageKey = generateKey();
+                        $filename = $filename . '.' . $ext;
+//                        $fileway = './uploads/' .
+//                            $subdirname1 . '/' .
+//                            $subdirname2 . '/' .
+//                            $filename . '.' . $ext;
                         $conn = mysqli_connect(
                             'localhost',
                             'root',
                             '',
                             'localhost_table'
                         );
-                        $sql = 'INSERT INTO files (way, user_id) VALUES ("' . $fileway . '",' . $_SESSION['id'] . ')';
+                        $sql = 'INSERT INTO files (real_name, hash_name, image_key, user_id) VALUES ("' . $realName . '", "' . $filename . '", "' . $imageKey . '",' . $_SESSION['id'] . ')';
                         mysqli_query($conn, $sql);
+
                     }
 
                 }
+            } else {
+                echo 'Please Select file to Upload';
             }
             $sql = 'SELECT * FROM files WHERE user_id='.$_SESSION['id'];
             $conn = mysqli_connect(
@@ -83,10 +97,10 @@ session_start();
             $result = mysqli_query($conn, $sql);
 
             while ($row = mysqli_fetch_assoc($result)) {
-                echo '<img src="' . $row['way'] . '" width="100"/> <br/>
+                echo '<br/><img src="./uploads/' . $row['hash_name'][0] . '/' . $row['hash_name'][1] . '/' . $row['hash_name'] . '" width="100"/> <br/>
                     <a href="delete.php?del='.$row['id'].'">Delete picture</a> 
-                    <a href="download.php?name=' . $row['way'] . '">Link</a>
-                    <input value="' . $row['way'] . '"> <br/>';
+                    <a href="download.php?name=' . $row['image_key'] . '">Link</a>
+                    <input value="localhost/download.php?name=' . $row['image_key'] . '"> <br/>';
             }
         } else {
             echo 'Что-то пошло не так!';
